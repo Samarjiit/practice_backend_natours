@@ -1,7 +1,9 @@
 const express = require('express');
 const morgan = require('morgan');
+const AppError = require('./utils/appError');
 const tourRouter = require('./rou/tourRou');
 const userRouter = require('./rou/userRou');
+const globalErrorHandler = require('./controllers/errorController');
 const app = express();
 
 // app.get('/', (req, res) => {
@@ -42,6 +44,17 @@ Middleware functions in Express.js have access to the request object (`req`), th
 
 app.use('/api/v1/tours', tourRouter); //tourRouter is a middleware
 app.use('/api/v1/users', userRouter);
+
+//handling unhandler routes
+app.all('*', (req, res, next) => {
+  next(new AppError(`cant't find ${req.originalUrl} on this server!!`, 404));
+  // const err = new Error(`cant't find ${req.originalUrl} on this server!!`);
+  // err.status = 'fail';
+  // err.statusCode = 404;
+  // next(err);
+});
+
+app.use(globalErrorHandler);
 
 //4.START THE SERVER
 
