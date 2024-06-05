@@ -12,3 +12,4 @@ class AppError extends Error {
 }
 
 module.exports = AppError;
+//all app error is here

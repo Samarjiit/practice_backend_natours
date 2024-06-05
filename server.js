@@ -1,5 +1,15 @@
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
+
+//synchronous error are called uncaught exception
+process.on('uncaughtException', (err) => {
+  console.log('uncaught exception !!🔥 shutting down....');
+  console.log(err.name, err.message);
+  console.log(err);
+
+  process.exit(1); //unhandle exception // abort all the request which is currently running
+});
+
 dotenv.config({ path: './config.env' });
 const app = require('./app');
 
@@ -50,7 +60,18 @@ mongoose.connect(DB, {}).then((con) => {
 //console.log(process.env);
 
 const port = process.env.PORT || 3001;
-app.listen(port, () => {
+const server = app.listen(port, () => {
   console.log(`App running on port ${port}...`);
 });
-//save 
+//save
+
+//handle unhandled rejections - like db not working
+process.on('unhandledRejection', (err) => {
+  console.log('unhandled rejection !!🔥 shutting down....');
+  console.log(err.name, err.message);
+  console.log(err);
+  server.close(() => {
+    process.exit(1); //unhandle exception // abort all the request which is currently running
+  });
+});
+//procoess.exit(0) = success
